@@ -1,12 +1,12 @@
 {
-  "name": "purescript-react-dom",
+  "name": "purescript-react-example",
   "main": "",
   "ignore": [
     "*",
     "!src/**/*"
   ],
   "dependencies": {
-    "purescript-react": "~0.5.0",
-    "purescript-dom": "~0.2.10"
+    "purescript-console": "~0.1.1",
+    "purescript-react-dom": "https://github.com/ethul/purescript-react-dom.git#34cf441939de19a399366669febdce25d5e98c6b"
   }
 }
