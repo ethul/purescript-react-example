@@ -1,0 +1,7 @@
+{
+  "name": "purescript-react-dom",
+  "files": [],
+  "peerDependencies": {
+    "react-dom": "^0.14.3"
+  }
+}
