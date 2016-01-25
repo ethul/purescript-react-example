@@ -7,6 +7,6 @@
   ],
   "dependencies": {
     "purescript-console": "~0.1.1",
-    "purescript-react-dom": "https://github.com/ethul/purescript-react-dom.git#34cf441939de19a399366669febdce25d5e98c6b"
+    "purescript-react-dom": "~0.1.0"
   }
 }

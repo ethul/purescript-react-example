@@ -10,11 +10,11 @@ import Data.Nullable (toMaybe)
 
 import DOM (DOM())
 import DOM.HTML (window)
-import DOM.HTML.Document (body)
-import DOM.HTML.Types (htmlElementToElement)
+import DOM.HTML.Types (htmlDocumentToDocument)
 import DOM.HTML.Window (document)
 
-import DOM.Node.Types (Element())
+import DOM.Node.NonElementParentNode (getElementById)
+import DOM.Node.Types (Element(), ElementId(..), documentToNonElementParentNode)
 
 import React
 import ReactDOM (render)
@@ -63,20 +63,20 @@ counter = createClass counterSpec
                       ]
 
 main :: forall eff. Eff (dom :: DOM | eff) Unit
-main = void (body' >>= render ui)
+main = void (elm' >>= render ui)
   where
   ui :: ReactElement
   ui = D.div' [ createFactory hello { name: "World" }
               , createFactory counter unit
               , createElement container unit
-                              [ D.p [] [ D.text  "This is line one" ]
-                              , D.p [] [ D.text "This is line two" ]
+                              [ D.p [ P.key "1" ] [ D.text  "This is line one" ]
+                              , D.p [ P.key "2" ] [ D.text "This is line two" ]
                               ]
               ]
 
-  body' :: Eff (dom :: DOM | eff) Element
-  body' = do
+  elm' :: Eff (dom :: DOM | eff) Element
+  elm' = do
     win <- window
     doc <- document win
-    elm <- fromJust <$> toMaybe <$> body doc
-    return $ htmlElementToElement elm
+    elm <- getElementById (ElementId "example") (documentToNonElementParentNode (htmlDocumentToDocument doc))
+    return $ fromJust (toMaybe elm)

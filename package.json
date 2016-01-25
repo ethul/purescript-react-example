@@ -6,7 +6,7 @@
     "install": "bower install"
   },
   "peerDependencies": {
-    "react-dom": "^0.14.3"
+    "react-dom": "^0.14.6"
   },
   "devDependencies": {
     "webpack": "^1.12.9"
