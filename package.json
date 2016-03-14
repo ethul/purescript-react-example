@@ -2,7 +2,7 @@
   "name": "purescript-react-example",
   "files": [],
   "scripts": {
-    "build": "pulp build --force -r ../ && webpack --progress --colors",
+    "build": "pulp build -r ../ && webpack --progress --colors",
     "install": "bower install"
   },
   "peerDependencies": {
