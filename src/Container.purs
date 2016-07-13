@@ -1,11 +1,9 @@
 module Container where
 
 import Prelude
-
-import React
-
-import qualified React.DOM.Dynamic as D
-import qualified React.DOM.Props as P
+import React (ReactClass, getChildren, spec, createClass)
+import React.DOM.Dynamic as D
+import React.DOM.Props as P
 
 container :: ReactClass Unit
 container = createClass $ spec unit \ctx -> do
@@ -18,4 +16,4 @@ container = createClass $ spec unit \ctx -> do
                            }
                  ] children
 
-  return ui
+  pure ui

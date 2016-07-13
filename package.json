@@ -1,14 +1,8 @@
 {
   "name": "purescript-react-example",
   "files": [],
-  "scripts": {
-    "build": "pulp build -r ../ && webpack --progress --colors",
-    "install": "bower install"
-  },
-  "peerDependencies": {
+  "dependencies": {
+    "react": "^0.14.8",
     "react-dom": "^0.14.6"
-  },
-  "devDependencies": {
-    "webpack": "^1.12.9"
   }
 }

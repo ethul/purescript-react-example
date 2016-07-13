@@ -1,12 +1,12 @@
 # purescript-react-example
 
-Example using low-level React DOM bindings for PureScript.
+Example using low-level React DOM bindings for PureScript 0.9.1
 
 ## Building
 
     bower install
     npm install
 
-    npm run build
+    pulp browserify --to public/scripts/Main.js
 
-    open index.html
+    open public/html/index.html
