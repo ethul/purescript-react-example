@@ -31,13 +31,13 @@ initialState = "0"
 
 hello :: forall props. ReactClass { name :: String | props }
 hello = createClass $ spec unit \ctx -> do
-  props' <- getProps ctx
+  props <- getProps ctx
   pure $ D.h1 [ P.className "Hello"
               , P.style { background: "lightgray" }
               ]
               [ D.text "Hello, "
-              , D.text props'.name
-              , createElement (createClassStateless \props'' -> D.div' [ D.text $ "Stateless" <> props''.test ])
+              , D.text props.name
+              , createElement (createClassStateless \props' -> D.div' [ D.text $ "Stateless" <> props'.test ])
                                 { test: " test" } []
               ]
 
