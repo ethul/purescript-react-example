@@ -1,66 +1,73 @@
 module Main where
 
 import Prelude
-
-import Control.Monad.Eff
-import Control.Monad.Eff.Console
-
-import Data.Maybe.Unsafe (fromJust)
-import Data.Nullable (toMaybe)
-
-import DOM (DOM())
+import React.DOM as D
+import React.DOM.Props as P
+import Container (container)
+import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Console (log)
+import DOM (DOM)
 import DOM.HTML (window)
 import DOM.HTML.Types (htmlDocumentToDocument)
 import DOM.HTML.Window (document)
-
 import DOM.Node.NonElementParentNode (getElementById)
-import DOM.Node.Types (Element(), ElementId(..), documentToNonElementParentNode)
-
-import React
+import DOM.Node.Types (Element, ElementId(..), documentToNonElementParentNode)
+import Data.Int (decimal, fromString, toStringAs)
+import Data.Maybe (fromJust)
+import Data.Nullable (toMaybe)
+import Partial.Unsafe (unsafePartial)
+import React (ReactElement, ReactClass, createElement, createFactory, createClassStateless, getProps, spec, readState, createClass, writeState)
 import ReactDOM (render)
-
-import qualified React.DOM as D
-import qualified React.DOM.Props as P
-
-import Container (container)
 
 foreign import interval :: forall eff a.
                              Int ->
                              Eff eff a ->
                              Eff eff Unit
 
+type State = String
+
+initialState :: State
+initialState = "0"
+
 hello :: forall props. ReactClass { name :: String | props }
 hello = createClass $ spec unit \ctx -> do
   props <- getProps ctx
-  return $ D.h1 [ P.className "Hello"
-                , P.style { background: "lightgray" }
-                ]
-                [ D.text "Hello, "
-                , D.text props.name
-                , createElement (createClassStateless \props -> D.div' [ D.text $ "Stateless" ++ props.test ])
-                                { test: "test" } []
-                ]
+  pure $ D.h1 [ P.className "Hello"
+              , P.style { background: "lightgray" }
+              ]
+              [ D.text "Hello, "
+              , D.text props.name
+              , createElement (createClassStateless \props' -> D.div' [ D.text $ "Stateless" <> props'.test ])
+                                { test: " test" } []
+              ]
+
+toInt :: String -> Int
+toInt s = unsafePartial fromJust $ fromString s
+
+inc1 :: String -> String
+inc1 s =
+  toStringAs decimal $ (toInt s) + 1
 
 counter :: forall props. ReactClass props
 counter = createClass counterSpec
   where
-  counterSpec = (spec 0 render)
+  counterSpec = (spec initialState render)
     { componentDidMount = \ctx ->
         interval 1000 $ do
-          val <- readState ctx
-          print val
+          val1 <- readState ctx
+          log val1
     }
 
   render ctx = do
-    val <- readState ctx
-    return $ D.button [ P.className "Counter"
-                      , P.onClick \_ -> do
-                          val <- readState ctx
-                          writeState ctx (val + 1)
-                      ]
-                      [ D.text (show val)
-                      , D.text " Click me to increment!"
-                      ]
+    val2 <- readState ctx
+    pure $ D.button [ P.className "Counter"
+                    , P.onClick \_ -> do
+                          val3 <- readState ctx
+                          writeState ctx (inc1 val3)
+                    ]
+                    [ D.text val2
+                    , D.text " Click me to increment!"
+                    ]
 
 main :: forall eff. Eff (dom :: DOM | eff) Unit
 main = void (elm' >>= render ui)
@@ -79,4 +86,4 @@ main = void (elm' >>= render ui)
     win <- window
     doc <- document win
     elm <- getElementById (ElementId "example") (documentToNonElementParentNode (htmlDocumentToDocument doc))
-    return $ fromJust (toMaybe elm)
+    pure $ unsafePartial fromJust (toMaybe elm)
