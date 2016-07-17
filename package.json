@@ -1,6 +1,10 @@
 {
   "name": "purescript-react-example",
   "files": [],
+  "scripts": {
+    "build": "pulp browserify --to public/scripts/Main.js",
+    "watch": "pulp --watch browserify --to public/scripts/Main.js"
+  },
   "dependencies": {
     "react": "^0.14.8",
     "react-dom": "^0.14.6"
