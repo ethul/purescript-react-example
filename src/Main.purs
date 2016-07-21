@@ -6,17 +6,17 @@ import React.DOM.Props as P
 import Container (container)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (log)
-import DOM (DOM)
+import DOM (DOM())
 import DOM.HTML (window)
 import DOM.HTML.Types (htmlDocumentToDocument)
 import DOM.HTML.Window (document)
 import DOM.Node.NonElementParentNode (getElementById)
 import DOM.Node.Types (Element, ElementId(..), documentToNonElementParentNode)
-import Data.Int (decimal, fromString, toStringAs)
+import Data.Int (decimal, toStringAs)
 import Data.Maybe (fromJust)
 import Data.Nullable (toMaybe)
 import Partial.Unsafe (unsafePartial)
-import React (ReactElement, ReactClass, createElement, createFactory, createClassStateless, getProps, spec, readState, createClass, writeState)
+import React (ReactElement, ReactClass, createElement, createFactory, createClass, writeState, readState, spec, createClassStateless, getProps)
 import ReactDOM (render)
 
 foreign import interval :: forall eff a.
@@ -24,10 +24,12 @@ foreign import interval :: forall eff a.
                              Eff eff a ->
                              Eff eff Unit
 
-type State = String
+newtype AppState = AppState
+  { count :: Int }
 
-initialState :: State
-initialState = "0"
+initialState :: AppState
+initialState = AppState { count: 0  }
+
 
 hello :: forall props. ReactClass { name :: String | props }
 hello = createClass $ spec unit \ctx -> do
@@ -41,12 +43,7 @@ hello = createClass $ spec unit \ctx -> do
                                 { test: " test" } []
               ]
 
-toInt :: String -> Int
-toInt s = unsafePartial fromJust $ fromString s
 
-inc1 :: String -> String
-inc1 s =
-  toStringAs decimal $ (toInt s) + 1
 
 counter :: forall props. ReactClass props
 counter = createClass counterSpec
@@ -54,18 +51,26 @@ counter = createClass counterSpec
   counterSpec = (spec initialState render)
     { componentDidMount = \ctx ->
         interval 1000 $ do
-          val1 <- readState ctx
-          log val1
+          readState ctx >>=
+            toString >>> log
     }
 
+  toString :: AppState -> String
+  toString ( AppState { count } )  =
+      toStringAs decimal count
+
+  addOne :: AppState -> AppState
+  addOne ( AppState { count } ) = do
+      AppState { count: count + 1 }
+
   render ctx = do
-    val2 <- readState ctx
+    count <- readState ctx
     pure $ D.button [ P.className "Counter"
                     , P.onClick \_ -> do
-                          val3 <- readState ctx
-                          writeState ctx (inc1 val3)
+                        readState ctx >>=
+                          addOne >>> writeState ctx
                     ]
-                    [ D.text val2
+                    [ D.text (toString count)
                     , D.text " Click me to increment!"
                     ]
 

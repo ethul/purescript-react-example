@@ -1,6 +1,7 @@
 .DS_Store
 .psci
 .psci_modules
+.psc-ide-port
 .pulp-cache
 npm-debug.log
 node_modules/
