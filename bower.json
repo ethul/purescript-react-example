@@ -6,14 +6,8 @@
     "!src/**/*"
   ],
   "dependencies": {
-    "purescript-console": "^1.0.0",
-    "purescript-dom": "^1.0.0",
-    "purescript-foreign": "^1.0.0",
-    "purescript-react-dom": "^1.0.0",
-    "purescript-react": "^1.0.0",
-    "purescript-unsafe-coerce": "^1.0.0"
-  },
-  "devDependencies": {
-    "purescript-psci-support": "^1.0.0"
+    "purescript-react": "^2.0.0",
+    "purescript-react-dom": "^2.0.0",
+    "purescript-console": "^2.0.0"
   }
 }

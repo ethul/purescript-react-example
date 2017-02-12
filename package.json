@@ -2,11 +2,18 @@
   "name": "purescript-react-example",
   "files": [],
   "scripts": {
-    "build": "pulp browserify --to public/scripts/Main.js",
-    "watch": "pulp --watch browserify --to public/scripts/Main.js"
+    "webpack": "webpack --progress",
+    "webpack:watch": "webpack --progress --watch",
+    "webpack-dev-server": "webpack-dev-server --progress --inline --hot"
   },
   "dependencies": {
-    "react": "^0.14.8",
-    "react-dom": "^0.14.6"
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "devDependencies": {
+    "purescript": "0.10.5",
+    "purs-loader": "^2.2.0",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
   }
 }

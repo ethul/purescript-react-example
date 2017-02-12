@@ -3,9 +3,9 @@
 .psci_modules
 .psc-ide-port
 .pulp-cache
+bundle.js
 npm-debug.log
 node_modules/
 bower_components/
-public/scripts/Main.js
 tmp/
 output/
