@@ -11,8 +11,8 @@
     "react-dom": "^15.4.2"
   },
   "devDependencies": {
-    "purescript": "0.10.5",
-    "purs-loader": "^2.2.0",
+    "purescript": "0.11.5",
+    "purs-loader": "^3.0.0",
     "webpack": "^1.13.3",
     "webpack-dev-server": "^1.16.2"
   }
