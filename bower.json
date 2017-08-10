@@ -6,8 +6,8 @@
     "!src/**/*"
   ],
   "dependencies": {
-    "purescript-react": "^3.0.0",
-    "purescript-react-dom": "^3.0.0",
+    "purescript-react": "^4.1.0",
+    "purescript-react-dom": "^4.0.0",
     "purescript-console": "^3.0.0"
   }
 }
