@@ -2,16 +2,18 @@
   "name": "purescript-react-example",
   "files": [],
   "scripts": {
+    "purs:compile": "purs compile 'bower_components/purescript-*/src/**/*.purs' 'src/**/*.purs'",
+    "pscid": "pscid",
     "webpack": "webpack --progress",
     "webpack:watch": "webpack --progress --watch",
     "webpack-dev-server": "webpack-dev-server --progress --inline --hot"
   },
   "dependencies": {
-    "create-react-class": "^15.6.0",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
   },
   "devDependencies": {
+    "pscid": "^2.0.2",
     "purescript": "0.11.6",
     "purs-loader": "^3.0.0",
     "webpack": "^1.13.3",

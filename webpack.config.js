@@ -5,7 +5,7 @@ module.exports = {
 
   debug: true,
 
-  devtool: 'eval',
+  devtool: 'cheap-module-inline-source-map',
 
   devServer: {
     contentBase: '.',
@@ -29,7 +29,8 @@ module.exports = {
           src: [
             'bower_components/purescript-*/src/**/*.purs',
             'src/**/*.purs'
-          ]
+          ],
+          pscIde: true
         }
       }
     ]

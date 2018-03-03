@@ -1,93 +1,82 @@
 module Main where
 
 import Prelude
-import React.DOM as D
-import React.DOM.Props as P
-import Container (container)
+
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (log)
-import DOM (DOM())
-import DOM.HTML (window)
-import DOM.HTML.Types (htmlDocumentToDocument)
-import DOM.HTML.Window (document)
-import DOM.Node.NonElementParentNode (getElementById)
-import DOM.Node.Types (Element, ElementId(..), documentToNonElementParentNode)
-import Data.Int (decimal, toStringAs)
-import Data.Maybe (fromJust)
+
+import Data.Array (snoc, modifyAt, elemIndex)
+import Data.Maybe (Maybe(..), fromJust, fromMaybe)
+
+import DOM (DOM)
+import DOM.HTML (window) as DOM
+import DOM.HTML.Types (htmlDocumentToDocument) as DOM
+import DOM.HTML.Window (document) as DOM
+import DOM.Node.NonElementParentNode (getElementById) as DOM
+import DOM.Node.Types (ElementId(..))
+import DOM.Node.Types (documentToNonElementParentNode) as DOM
+
 import Partial.Unsafe (unsafePartial)
-import React (ReactElement, ReactClass, createElement, createFactory, createClass, writeState, readState, spec, createClassStateless, getProps)
-import ReactDOM (render)
 
-foreign import interval :: forall eff a.
-                             Int ->
-                             Eff eff a ->
-                             Eff eff Unit
+import React as React
+import ReactDOM as ReactDOM
 
-newtype AppState = AppState
-  { count :: Int }
-
-initialState :: AppState
-initialState = AppState { count: 0  }
-
-
-hello :: forall props. ReactClass { name :: String | props }
-hello = createClass $ spec unit \ctx -> do
-  props <- getProps ctx
-  pure $ D.h1 [ P.className "Hello"
-              , P.style { background: "lightgray" }
-              ]
-              [ D.text "Hello, "
-              , D.text props.name
-              , createElement (createClassStateless \props' -> D.div' [ D.text $ "Stateless" <> props'.test ])
-                                { test: " test" } []
-              ]
-
-
-
-counter :: forall props. ReactClass props
-counter = createClass counterSpec
-  where
-  counterSpec = (spec initialState render)
-    { componentDidMount = \ctx ->
-        interval 1000 $ do
-          readState ctx >>=
-            toString >>> log
-    }
-
-  toString :: AppState -> String
-  toString ( AppState { count } )  =
-      toStringAs decimal count
-
-  addOne :: AppState -> AppState
-  addOne ( AppState { count } ) = do
-      AppState { count: count + 1 }
-
-  render ctx = do
-    count <- readState ctx
-    pure $ D.button [ P.className "Counter"
-                    , P.onClick \_ -> do
-                        readState ctx >>=
-                          addOne >>> writeState ctx
-                    ]
-                    [ D.text (toString count)
-                    , D.text " Click me to increment!"
-                    ]
+import Example.TodoList (todoListClass)
+import Example.Types (Todo(..), TodoStatus(..))
 
 main :: forall eff. Eff (dom :: DOM | eff) Unit
-main = void (elm' >>= render ui)
-  where
-  ui :: ReactElement
-  ui = D.div' [ createFactory hello { name: "World" }
-              , createFactory counter unit
-              , createElement container unit
-                              [ D.p [ P.key "1" ] [ D.text  "This is line one" ]
-                              , D.p [ P.key "2" ] [ D.text "This is line two" ]
-                              ]
-              ]
+main = void $ do
+  window <- DOM.window
 
-  elm' :: Eff (dom :: DOM | eff) Element
-  elm' = do
-    win <- window
-    doc <- document win
-    elm <- getElementById (ElementId "example") (documentToNonElementParentNode (htmlDocumentToDocument doc))
-    pure $ unsafePartial (fromJust elm)
+  document <- DOM.document window
+
+  let
+      node = DOM.documentToNonElementParentNode (DOM.htmlDocumentToDocument document)
+
+  element <- DOM.getElementById (ElementId "example") node
+
+  let
+      element' = unsafePartial (fromJust element)
+
+  ReactDOM.render (React.createLeafElement mainClass { }) element'
+
+mainClass :: React.ReactClass { }
+mainClass = React.component "Main" component
+  where
+  component this =
+    pure { state:
+            { todo: Nothing
+            , todos: []
+            }
+         , render: render <$> React.readState this
+         }
+    where
+    render
+      { todo
+      , todos
+      } =
+      React.createLeafElement todoListClass
+        { todos
+        , todo
+
+        , onAdd: \todo' -> React.transformState this \a ->
+            a { todo = Nothing
+              , todos = snoc a.todos todo'
+              }
+
+        , onEdit: \todo' -> React.transformState this
+            _ { todo = Just todo'
+              }
+
+        , onDone: \todo' -> React.transformState this \a ->
+            a { todos = setStatus a.todos todo' TodoDone
+              }
+
+        , onClear : \todo' -> React.transformState this \a ->
+            a { todos = setStatus a.todos todo' TodoCleared
+              }
+        }
+
+    setStatus todos todo status = fromMaybe todos $ do
+      i <- elemIndex todo todos
+
+      modifyAt i (\(Todo a) -> Todo a { status = status }) todos
