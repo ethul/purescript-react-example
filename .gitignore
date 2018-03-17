@@ -5,6 +5,7 @@
 .pulp-cache
 bundle.js
 npm-debug.log
+yarn-error.log
 node_modules/
 bower_components/
 tmp/

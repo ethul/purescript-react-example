@@ -6,7 +6,7 @@
     "!src/**/*"
   ],
   "dependencies": {
-    "purescript-react": "natefaubion/purescript-react#alt-class",
+    "purescript-react": "natefaubion/purescript-react#0bdae9e12d48aa4808bf35ef0242ddde9e717a9f",
     "purescript-react-dom": "^4.0.0",
     "purescript-console": "^3.0.0"
   }

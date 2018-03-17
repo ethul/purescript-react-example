@@ -21,7 +21,7 @@ todoItemClass = React.component "TodoItem" component
     render { todo: Todo { text, status } } =
       DOM.div
         [ Props.style { textDecoration } ]
-        [ DOM.text text ]
+        [ React.toElement text ]
       where
       textDecoration =
         case status of

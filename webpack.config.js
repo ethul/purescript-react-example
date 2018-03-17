@@ -3,8 +3,6 @@
 module.exports = {
   entry: './src/App',
 
-  debug: true,
-
   devtool: 'cheap-module-inline-source-map',
 
   devServer: {
@@ -20,12 +18,12 @@ module.exports = {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.purs$/,
-        loader: 'purs-loader',
         exclude: /node_modules/,
-        query: {
+        loader: 'purs-loader',
+        options: {
           src: [
             'bower_components/purescript-*/src/**/*.purs',
             'src/**/*.purs'
@@ -37,10 +35,14 @@ module.exports = {
   },
 
   resolve: {
-    modulesDirectories: [
+    modules: [
       'node_modules',
       'bower_components'
     ],
-    extensions: [ '', '.purs', '.js']
+
+    extensions: [
+      '.purs',
+      '.js'
+    ]
   }
 };
