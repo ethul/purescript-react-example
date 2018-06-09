@@ -1,93 +1,79 @@
 module Main where
 
 import Prelude
-import React.DOM as D
-import React.DOM.Props as P
-import Container (container)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (log)
-import DOM (DOM())
-import DOM.HTML (window)
-import DOM.HTML.Types (htmlDocumentToDocument)
-import DOM.HTML.Window (document)
-import DOM.Node.NonElementParentNode (getElementById)
-import DOM.Node.Types (Element, ElementId(..), documentToNonElementParentNode)
-import Data.Int (decimal, toStringAs)
-import Data.Maybe (fromJust)
+
+import Effect (Effect)
+
+import Data.Array (snoc, modifyAt, elemIndex)
+import Data.Maybe (Maybe(..), fromJust, fromMaybe)
+
+import Web.HTML.HTMLDocument (toNonElementParentNode) as DOM
+import Web.DOM.NonElementParentNode (getElementById) as DOM
+import Web.HTML (window) as DOM
+import Web.HTML.Window (document) as DOM
+
 import Partial.Unsafe (unsafePartial)
-import React (ReactElement, ReactClass, createElement, createFactory, createClass, writeState, readState, spec, createClassStateless, getProps)
-import ReactDOM (render)
 
-foreign import interval :: forall eff a.
-                             Int ->
-                             Eff eff a ->
-                             Eff eff Unit
+import React as React
+import ReactDOM as ReactDOM
 
-newtype AppState = AppState
-  { count :: Int }
+import Example.TodoList (todoListClass)
+import Example.Types (Todo(..), TodoStatus(..))
 
-initialState :: AppState
-initialState = AppState { count: 0  }
+main :: Effect Unit
+main = void $ do
+  window <- DOM.window
 
+  document <- DOM.document window
 
-hello :: forall props. ReactClass { name :: String | props }
-hello = createClass $ spec unit \ctx -> do
-  props <- getProps ctx
-  pure $ D.h1 [ P.className "Hello"
-              , P.style { background: "lightgray" }
-              ]
-              [ D.text "Hello, "
-              , D.text props.name
-              , createElement (createClassStateless \props' -> D.div' [ D.text $ "Stateless" <> props'.test ])
-                                { test: " test" } []
-              ]
+  let
+      node = DOM.toNonElementParentNode document
 
+  element <- DOM.getElementById "example" node
 
+  let
+      element' = unsafePartial (fromJust element)
 
-counter :: forall props. ReactClass props
-counter = createClass counterSpec
+  ReactDOM.render (React.createLeafElement mainClass { }) element'
+
+mainClass :: React.ReactClass { }
+mainClass = React.component "Main" component
   where
-  counterSpec = (spec initialState render)
-    { componentDidMount = \ctx ->
-        interval 1000 $ do
-          readState ctx >>=
-            toString >>> log
-    }
+  component this =
+    pure { state:
+            { todo: Nothing
+            , todos: []
+            }
+         , render: render <$> React.getState this
+         }
+    where
+    render
+      { todo
+      , todos
+      } =
+      React.createLeafElement todoListClass
+        { todos
+        , todo
 
-  toString :: AppState -> String
-  toString ( AppState { count } )  =
-      toStringAs decimal count
+        , onAdd: \todo' -> React.modifyState this \a ->
+            a { todo = Nothing
+              , todos = snoc a.todos todo'
+              }
 
-  addOne :: AppState -> AppState
-  addOne ( AppState { count } ) = do
-      AppState { count: count + 1 }
+        , onEdit: \todo' -> React.modifyState this
+            _ { todo = Just todo'
+              }
 
-  render ctx = do
-    count <- readState ctx
-    pure $ D.button [ P.className "Counter"
-                    , P.onClick \_ -> do
-                        readState ctx >>=
-                          addOne >>> writeState ctx
-                    ]
-                    [ D.text (toString count)
-                    , D.text " Click me to increment!"
-                    ]
+        , onDone: \todo' -> React.modifyState this \a ->
+            a { todos = setStatus a.todos todo' TodoDone
+              }
 
-main :: forall eff. Eff (dom :: DOM | eff) Unit
-main = void (elm' >>= render ui)
-  where
-  ui :: ReactElement
-  ui = D.div' [ createFactory hello { name: "World" }
-              , createFactory counter unit
-              , createElement container unit
-                              [ D.p [ P.key "1" ] [ D.text  "This is line one" ]
-                              , D.p [ P.key "2" ] [ D.text "This is line two" ]
-                              ]
-              ]
+        , onClear : \todo' -> React.modifyState this \a ->
+            a { todos = setStatus a.todos todo' TodoCleared
+              }
+        }
 
-  elm' :: Eff (dom :: DOM | eff) Element
-  elm' = do
-    win <- window
-    doc <- document win
-    elm <- getElementById (ElementId "example") (documentToNonElementParentNode (htmlDocumentToDocument doc))
-    pure $ unsafePartial (fromJust elm)
+    setStatus todos todo status = fromMaybe todos $ do
+      i <- elemIndex todo todos
+
+      modifyAt i (\(Todo a) -> Todo a { status = status }) todos

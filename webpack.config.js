@@ -3,9 +3,7 @@
 module.exports = {
   entry: './src/App',
 
-  debug: true,
-
-  devtool: 'eval',
+  devtool: 'cheap-module-inline-source-map',
 
   devServer: {
     contentBase: '.',
@@ -20,26 +18,31 @@ module.exports = {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.purs$/,
-        loader: 'purs-loader',
         exclude: /node_modules/,
-        query: {
+        loader: 'purs-loader',
+        options: {
           src: [
             'bower_components/purescript-*/src/**/*.purs',
             'src/**/*.purs'
-          ]
+          ],
+          pscIde: true
         }
       }
     ]
   },
 
   resolve: {
-    modulesDirectories: [
+    modules: [
       'node_modules',
       'bower_components'
     ],
-    extensions: [ '', '.purs', '.js']
+
+    extensions: [
+      '.purs',
+      '.js'
+    ]
   }
 };
