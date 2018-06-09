@@ -2,12 +2,12 @@ module Example.TodoForm where
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
+import Effect (Effect)
 
 import Data.Maybe (Maybe, maybe, isNothing)
 
 import React as React
+import React.SyntheticEvent as Event
 import React.DOM as DOM
 import React.DOM.Props as Props
 
@@ -15,13 +15,13 @@ import Unsafe.Coerce (unsafeCoerce)
 
 import Example.Types (Todo(..), TodoStatus(..))
 
-type TodoFormProps eff
+type TodoFormProps
   = { todo :: Maybe Todo
-    , onEdit :: Todo -> Eff eff Unit
-    , onAdd :: Todo -> Eff eff Unit
+    , onEdit :: Todo -> Effect Unit
+    , onAdd :: Todo -> Effect Unit
     }
 
-todoFormClass :: forall eff. React.ReactClass (TodoFormProps eff)
+todoFormClass :: React.ReactClass TodoFormProps
 todoFormClass = React.component "TodoForm" component
   where
   component this =
@@ -41,7 +41,6 @@ todoFormClass = React.component "TodoForm" component
             , Props.value value
             , Props.onChange onChange
             ]
-            [ ]
         , DOM.button
             [ Props._type "submit"
             , Props.disabled isDisabled
@@ -54,11 +53,11 @@ todoFormClass = React.component "TodoForm" component
       isDisabled = isNothing todo
 
       onSubmit event = do
-        React.preventDefault event
+        Event.preventDefault event
 
-        unsafeCoerceEff $ maybe (pure unit) onAdd todo
+        maybe (pure unit) onAdd todo
 
-      onChange event = unsafeCoerceEff $ onEdit $
+      onChange event = onEdit $
         maybe (Todo { text, status: TodoPending })
               (\(Todo todo_) -> Todo todo_ { text = text })
               todo

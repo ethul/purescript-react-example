@@ -2,8 +2,7 @@ module Example.TodoList where
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Unsafe (unsafeCoerceEff)
+import Effect (Effect)
 
 import Data.Array (filter)
 import Data.Maybe (Maybe)
@@ -16,16 +15,16 @@ import Example.TodoForm (todoFormClass)
 import Example.TodoItem (todoItemClass)
 import Example.Types (Todo(..), TodoStatus(..))
 
-type TodoListProps eff
+type TodoListProps
   = { todos :: Array Todo
     , todo :: Maybe Todo
-    , onAdd :: Todo -> Eff eff Unit
-    , onEdit :: Todo -> Eff eff Unit
-    , onDone :: Todo -> Eff eff Unit
-    , onClear :: Todo -> Eff eff Unit
+    , onAdd :: Todo -> Effect Unit
+    , onEdit :: Todo -> Effect Unit
+    , onDone :: Todo -> Effect Unit
+    , onClear :: Todo -> Effect Unit
     }
 
-todoListClass :: forall eff. React.ReactClass (TodoListProps eff)
+todoListClass :: React.ReactClass TodoListProps
 todoListClass = React.component "TodoList" component
   where
   component this =
@@ -72,7 +71,7 @@ todoListClass = React.component "TodoList" component
                TodoDone -> "Clear"
                _ -> ""
 
-        onClick event = unsafeCoerceEff $
+        onClick event =
           case status of
                TodoPending -> onDone todo'
                TodoDone -> onClear todo'

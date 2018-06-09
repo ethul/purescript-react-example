@@ -6,8 +6,9 @@
     "!src/**/*"
   ],
   "dependencies": {
-    "purescript-react-dom": "^4.0.0",
-    "purescript-console": "^3.0.0",
-    "purescript-react": "purescript-contrib/purescript-react#06a28663e6c18cedee005a90aad42b593f4c4163"
+    "purescript-react-dom": "natefaubion/purescript-react-dom#335a931e49e5ca28ebff924a0ac1b75a25c17106",
+    "purescript-console": "^4.0.0",
+    "purescript-react": "natefaubion/purescript-react#faf4762432694b774bdb2dc1a49ccaf26074b6ed",
+    "purescript-web-html": "^1.0.0"
   }
 }

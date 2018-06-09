@@ -2,18 +2,15 @@ module Main where
 
 import Prelude
 
-import Control.Monad.Eff (Eff)
+import Effect (Effect)
 
 import Data.Array (snoc, modifyAt, elemIndex)
 import Data.Maybe (Maybe(..), fromJust, fromMaybe)
 
-import DOM (DOM)
-import DOM.HTML (window) as DOM
-import DOM.HTML.Types (htmlDocumentToDocument) as DOM
-import DOM.HTML.Window (document) as DOM
-import DOM.Node.NonElementParentNode (getElementById) as DOM
-import DOM.Node.Types (ElementId(..))
-import DOM.Node.Types (documentToNonElementParentNode) as DOM
+import Web.HTML.HTMLDocument (toNonElementParentNode) as DOM
+import Web.DOM.NonElementParentNode (getElementById) as DOM
+import Web.HTML (window) as DOM
+import Web.HTML.Window (document) as DOM
 
 import Partial.Unsafe (unsafePartial)
 
@@ -23,16 +20,16 @@ import ReactDOM as ReactDOM
 import Example.TodoList (todoListClass)
 import Example.Types (Todo(..), TodoStatus(..))
 
-main :: forall eff. Eff (dom :: DOM | eff) Unit
+main :: Effect Unit
 main = void $ do
   window <- DOM.window
 
   document <- DOM.document window
 
   let
-      node = DOM.documentToNonElementParentNode (DOM.htmlDocumentToDocument document)
+      node = DOM.toNonElementParentNode document
 
-  element <- DOM.getElementById (ElementId "example") node
+  element <- DOM.getElementById "example" node
 
   let
       element' = unsafePartial (fromJust element)
@@ -47,7 +44,7 @@ mainClass = React.component "Main" component
             { todo: Nothing
             , todos: []
             }
-         , render: render <$> React.readState this
+         , render: render <$> React.getState this
          }
     where
     render
@@ -58,20 +55,20 @@ mainClass = React.component "Main" component
         { todos
         , todo
 
-        , onAdd: \todo' -> React.transformState this \a ->
+        , onAdd: \todo' -> React.modifyState this \a ->
             a { todo = Nothing
               , todos = snoc a.todos todo'
               }
 
-        , onEdit: \todo' -> React.transformState this
+        , onEdit: \todo' -> React.modifyState this
             _ { todo = Just todo'
               }
 
-        , onDone: \todo' -> React.transformState this \a ->
+        , onDone: \todo' -> React.modifyState this \a ->
             a { todos = setStatus a.todos todo' TodoDone
               }
 
-        , onClear : \todo' -> React.transformState this \a ->
+        , onClear : \todo' -> React.modifyState this \a ->
             a { todos = setStatus a.todos todo' TodoCleared
               }
         }
