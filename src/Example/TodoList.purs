@@ -11,8 +11,8 @@ import React as React
 import React.DOM as DOM
 import React.DOM.Props as Props
 
-import Example.TodoForm (todoFormClass)
-import Example.TodoItem (todoItemClass)
+import Example.TodoForm (todoForm)
+import Example.TodoItem (todoItem)
 import Example.Types (Todo(..), TodoStatus(..))
 
 type TodoListProps
@@ -24,55 +24,48 @@ type TodoListProps
     , onClear :: Todo -> Effect Unit
     }
 
-todoListClass :: React.ReactClass TodoListProps
-todoListClass = React.component "TodoList" component
-  where
-  component this =
-    pure { state: {}
-         , render: render <$> React.getProps this
-         }
-    where
-    render
-      { todos
-      , todo
-      , onAdd
-      , onEdit
-      , onDone
-      , onClear
-      } =
-      DOM.div
+todoList :: TodoListProps -> Effect React.ReactElement
+todoList
+  { todos
+  , todo
+  , onAdd
+  , onEdit
+  , onDone
+  , onClear
+  } = pure $
+  DOM.div
+    [ ]
+    [ React.createElementHooks todoForm
+        { todo
+        , onEdit
+        , onAdd
+        }
+    , DOM.ol
         [ ]
-        [ React.createLeafElement todoFormClass
-            { todo
-            , onEdit
-            , onAdd
-            }
-        , DOM.ol
-            [ ]
-            (renderItem <$> todos')
-        ]
-      where
-      todos' = filter (\(Todo { status }) -> TodoCleared /= status) todos
+        (renderItem <$> todos')
+    ]
+  where
+  todos' = filter (\(Todo { status }) -> TodoCleared /= status) todos
 
-      renderItem todo' @ Todo { status } =
-        DOM.li
-          [ ]
-          [ React.createLeafElement todoItemClass { todo: todo' }
-          , DOM.button
-              [ Props._type "button"
-              , Props.onClick onClick
-              ]
-              [ DOM.text text ]
+  renderItem todo' @ Todo { status } =
+    DOM.li
+      [ ]
+      [ React.createElementHooks todoItem { todo: todo' }
+      , DOM.button
+          [ Props._type "button"
+          , Props.onClick onClick
           ]
-        where
-        text =
-          case status of
-               TodoPending -> "Done"
-               TodoDone -> "Clear"
-               _ -> ""
+          [ DOM.text text ]
+      ]
+    where
+    text =
+      case status of
+           TodoPending -> "Done"
+           TodoDone -> "Clear"
+           _ -> ""
 
-        onClick event =
-          case status of
-               TodoPending -> onDone todo'
-               TodoDone -> onClear todo'
-               _ -> pure unit
+    onClick event =
+      case status of
+           TodoPending -> onDone todo'
+           TodoDone -> onClear todo'
+           _ -> pure unit

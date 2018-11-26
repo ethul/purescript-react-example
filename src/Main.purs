@@ -6,6 +6,7 @@ import Effect (Effect)
 
 import Data.Array (snoc, modifyAt, elemIndex)
 import Data.Maybe (Maybe(..), fromJust, fromMaybe)
+import Data.Tuple (Tuple(..))
 
 import Web.HTML.HTMLDocument (toNonElementParentNode) as DOM
 import Web.DOM.NonElementParentNode (getElementById) as DOM
@@ -15,9 +16,10 @@ import Web.HTML.Window (document) as DOM
 import Partial.Unsafe (unsafePartial)
 
 import React as React
+import React.Hooks as Hooks
 import ReactDOM as ReactDOM
 
-import Example.TodoList (todoListClass)
+import Example.TodoList (todoList)
 import Example.Types (Todo(..), TodoStatus(..))
 
 main :: Effect Unit
@@ -34,46 +36,44 @@ main = void $ do
   let
       element' = unsafePartial (fromJust element)
 
-  ReactDOM.render (React.createLeafElement mainClass { }) element'
+  ReactDOM.render (React.createElementHooks wrapper { }) element'
 
-mainClass :: React.ReactClass { }
-mainClass = React.component "Main" component
+wrapper :: { } -> Effect React.ReactElement
+wrapper _ = render <$> Hooks.useState initialState
   where
-  component this =
-    pure { state:
-            { todo: Nothing
-            , todos: []
-            }
-         , render: render <$> React.getState this
-         }
-    where
-    render
+  initialState =
+    { todo: Nothing
+    , todos: []
+    }
+
+  render
+    (Tuple
       { todo
       , todos
-      } =
-      React.createLeafElement todoListClass
-        { todos
-        , todo
+      } setState) =
+    React.createElementHooks todoList
+      { todos
+      , todo
 
-        , onAdd: \todo' -> React.modifyState this \a ->
-            a { todo = Nothing
-              , todos = snoc a.todos todo'
-              }
+      , onAdd: \todo' -> Hooks.modifyState setState \a ->
+          a { todo = Nothing
+            , todos = snoc a.todos todo'
+            }
 
-        , onEdit: \todo' -> React.modifyState this
-            _ { todo = Just todo'
-              }
+      , onEdit: \todo' -> Hooks.modifyState setState
+          _ { todo = Just todo'
+            }
 
-        , onDone: \todo' -> React.modifyState this \a ->
-            a { todos = setStatus a.todos todo' TodoDone
-              }
+      , onDone: \todo' -> Hooks.modifyState setState \a ->
+          a { todos = setStatus a.todos todo' TodoDone
+            }
 
-        , onClear : \todo' -> React.modifyState this \a ->
-            a { todos = setStatus a.todos todo' TodoCleared
-              }
-        }
+      , onClear : \todo' -> Hooks.modifyState setState \a ->
+          a { todos = setStatus a.todos todo' TodoCleared
+            }
+      }
 
-    setStatus todos todo status = fromMaybe todos $ do
-      i <- elemIndex todo todos
+  setStatus todos todo status = fromMaybe todos $ do
+    i <- elemIndex todo todos
 
-      modifyAt i (\(Todo a) -> Todo a { status = status }) todos
+    modifyAt i (\(Todo a) -> Todo a { status = status }) todos

@@ -8,7 +8,11 @@
   "dependencies": {
     "purescript-react-dom": "^6.0.0",
     "purescript-console": "^4.0.0",
-    "purescript-react": "^6.0.0",
-    "purescript-web-html": "^1.0.0"
+    "purescript-react": "hooks",
+    "purescript-web-html": "^1.0.0",
+    "purescript-free": "^5.1.0"
+  },
+  "resolutions": {
+    "purescript-react": "hooks"
   }
 }
