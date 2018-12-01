@@ -16,7 +16,8 @@ import Web.HTML.Window (document) as DOM
 import Partial.Unsafe (unsafePartial)
 
 import React as React
-import React.Hooks as Hooks
+import React.Hook (Hook)
+import React.Hook as Hook
 import ReactDOM as ReactDOM
 
 import Example.TodoList (todoList)
@@ -36,10 +37,10 @@ main = void $ do
   let
       element' = unsafePartial (fromJust element)
 
-  ReactDOM.render (React.createElementHooks wrapper { }) element'
+  ReactDOM.render (React.createElementHook wrapper { }) element'
 
-wrapper :: { } -> Effect React.ReactElement
-wrapper _ = render <$> Hooks.useState initialState
+wrapper :: { } -> Hook React.ReactElement
+wrapper _ = render <$> Hook.useState initialState
   where
   initialState =
     { todo: Nothing
@@ -51,24 +52,24 @@ wrapper _ = render <$> Hooks.useState initialState
       { todo
       , todos
       } setState) =
-    React.createElementHooks todoList
+    React.createElementHook todoList
       { todos
       , todo
 
-      , onAdd: \todo' -> Hooks.modifyState setState \a ->
+      , onAdd: \todo' -> Hook.modifyState setState \a ->
           a { todo = Nothing
             , todos = snoc a.todos todo'
             }
 
-      , onEdit: \todo' -> Hooks.modifyState setState
+      , onEdit: \todo' -> Hook.modifyState setState
           _ { todo = Just todo'
             }
 
-      , onDone: \todo' -> Hooks.modifyState setState \a ->
+      , onDone: \todo' -> Hook.modifyState setState \a ->
           a { todos = setStatus a.todos todo' TodoDone
             }
 
-      , onClear : \todo' -> Hooks.modifyState setState \a ->
+      , onClear : \todo' -> Hook.modifyState setState \a ->
           a { todos = setStatus a.todos todo' TodoCleared
             }
       }

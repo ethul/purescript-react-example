@@ -8,6 +8,7 @@ import Data.Array (filter)
 import Data.Maybe (Maybe)
 
 import React as React
+import React.Hook (Hook)
 import React.DOM as DOM
 import React.DOM.Props as Props
 
@@ -24,7 +25,7 @@ type TodoListProps
     , onClear :: Todo -> Effect Unit
     }
 
-todoList :: TodoListProps -> Effect React.ReactElement
+todoList :: TodoListProps -> Hook React.ReactElement
 todoList
   { todos
   , todo
@@ -35,7 +36,7 @@ todoList
   } = pure $
   DOM.div
     [ ]
-    [ React.createElementHooks todoForm
+    [ React.createElementHook todoForm
         { todo
         , onEdit
         , onAdd
@@ -50,7 +51,7 @@ todoList
   renderItem todo' @ Todo { status } =
     DOM.li
       [ ]
-      [ React.createElementHooks todoItem { todo: todo' }
+      [ React.createElementHook todoItem { todo: todo' }
       , DOM.button
           [ Props._type "button"
           , Props.onClick onClick
