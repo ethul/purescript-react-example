@@ -36,7 +36,7 @@ todoList
   } = pure $
   DOM.div
     [ ]
-    [ React.createElementHook todoForm
+    [ React.createHookLeafElement todoForm
         { todo
         , onEdit
         , onAdd
@@ -51,7 +51,7 @@ todoList
   renderItem todo' @ Todo { status } =
     DOM.li
       [ ]
-      [ React.createElementHook todoItem { todo: todo' }
+      [ React.createHookLeafElement todoItem { todo: todo' }
       , DOM.button
           [ Props._type "button"
           , Props.onClick onClick
