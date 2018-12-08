@@ -9,11 +9,12 @@ import Effect (Effect)
 import React as React
 import React.Hook (Hook)
 import React.Hook as Hook
-import React.Ref (Ref, DOMRef)
 import React.Ref as Ref
 import React.SyntheticEvent as Event
 import React.DOM as DOM
 import React.DOM.Props as Props
+
+import Web.HTML.HTMLElement as HTML
 
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -74,7 +75,7 @@ todoForm
 
       domRef <- Ref.getRef ref
 
-      maybe (pure unit) blur domRef
+      maybe (pure unit) (HTML.blur <<< unsafeCoerce) domRef
 
       pure unit
 
@@ -84,5 +85,3 @@ todoForm
             todo
       where
       text = (unsafeCoerce event).target.value
-
-foreign import blur :: DOMRef -> Effect Unit
