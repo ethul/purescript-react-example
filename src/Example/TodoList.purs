@@ -8,10 +8,12 @@ import Data.Array (filter)
 import Data.Maybe (Maybe)
 
 import React as React
+import React.Context as Context
 import React.Hook (Hook)
 import React.DOM as DOM
 import React.DOM.Props as Props
 
+import Example.TodoContext as TodoContext
 import Example.TodoForm (todoForm)
 import Example.TodoItem (todoItem)
 import Example.Types (Todo(..), TodoStatus(..))
@@ -34,8 +36,11 @@ todoList
   , onDone
   , onClear
   } = pure $
-  DOM.div
-    [ ]
+  React.createElement provider
+    { value:
+        { backgroundColor: "lightblue"
+        }
+    }
     [ React.createHookLeafElement todoForm
         { todo
         , onEdit
@@ -46,6 +51,8 @@ todoList
         (renderItem <$> todos')
     ]
   where
+  provider = Context.getProvider TodoContext.todoContext
+
   todos' = filter (\(Todo { status }) -> TodoCleared /= status) todos
 
   renderItem todo' @ Todo { status } =
