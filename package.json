@@ -9,8 +9,8 @@
     "webpack-dev-server": "DEBUG=* webpack-dev-server --mode development --progress --inline --hot"
   },
   "dependencies": {
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "react": "^16.7.0-alpha.2",
+    "react-dom": "^16.7.0-alpha.2"
   },
   "devDependencies": {
     "pscid": "^2.0.2",
